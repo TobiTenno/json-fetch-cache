@@ -1,26 +1,27 @@
 {
-  "name": "json-fetch-cache"
-  , "version": "0.0.1"
-  , "description": "Utility for fetching and caching JSON for a configurable amount of time"
-  , "main": "jsoncache.js"
-  , "scripts": {
+  "name": "json-fetch-cache",
+  "version": "0.0.1",
+  "description": "Utility for fetching and caching JSON for a configurable amount of time",
+  "main": "jsoncache.js",
+  "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  }
-  , "keywords": [
-    "json"
-    , "cache"
-  ]
-  , "author": "tobiah"
-  , "license": "ISC"
-  , "dependencies": {
-    "request": "^2.75.0"
-  }
-  , "bugs": {
-    "url": "https://gitlab.com/tobiah/json-fetch-cache/issues"
-    , "email": "matej@voboril.org"
-  }
-  , "repository": {
-    "type": "git"
-    , "url": "https://gitlab.com/tobiah/json-fetch-cache.git"
+  },
+  "keywords": [
+    "json",
+    "cache"
+  ],
+  "author": "tobiah",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.75.0",
+    "request-promise": "^4.1.1"
+  },
+  "bugs": {
+    "url": "https://github.com/aliasfalse/json-fetch-cache/issues",
+    "email": "matej@voboril.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aliasfalse/json-fetch-cache.git"
   }
 }
