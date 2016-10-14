@@ -141,7 +141,7 @@ class JSONCache {
   
   /**
    * Get the cached data
-   * @returns {Promis<json>}
+   * @returns {Promise<json>}
    */ 
   getData() {
     const self = this;
