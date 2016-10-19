@@ -9,7 +9,7 @@ class JSONCache {
   /**
    * Represents a JSONCache
    * @constructor
-   * @param {string} _url URL for the location of the remote json
+   * @param {string} url URL for the location of the remote json
    * @param {number} maximumCacheTime The maximum amount of time that the cache should be allowed to be stale
    */
   constructor(url, maximumCacheTime) {
@@ -147,13 +147,12 @@ class JSONCache {
     const self = this;
     return new Promise((resolve, reject) => {
       if (self.dataIsCurrent !== null && self.dataIsCurrent) {
-        console.log(self.dataIsCurrent);
         resolve(self._cache);
       } else {
         self.refresh()
           .then((data) => {
-            resolve(data); 
-            console.log(data)})
+            resolve(data);
+          })
           .catch(console.err);
       }
     });
