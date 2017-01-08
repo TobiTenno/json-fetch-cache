@@ -25,11 +25,11 @@ class JSONCache {
   }
 
   getDataJson() {
-     if (this.updating) {
-       return this.updating.then(data => JSON.parse(data));
-     }
-     return Promise.resolve(JSON.parse(this.currentData));
-   }
+    if (this.updating) {
+      return this.updating.then(data => JSON.parse(data));
+    }
+    return Promise.resolve(JSON.parse(this.currentData));
+  }
 
   update() {
     this.updating = this.httpGet().then((data) => {
@@ -45,7 +45,7 @@ class JSONCache {
 
   httpGet() {
     return new Promise((resolve, reject) => {
-      const request = protocol.get(this.url, (response) => {
+      const request = this.protocol.get(this.url, (response) => {
         if (response.statusCode < 200 || response.statusCode > 299) {
           reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
         }
@@ -57,4 +57,4 @@ class JSONCache {
     });
   }
 }
-module.export = JSONCache;
+module.exports = JSONCache;
