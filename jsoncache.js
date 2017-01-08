@@ -45,7 +45,7 @@ class JSONCache {
 
   httpGet() {
     return new Promise((resolve, reject) => {
-      const request = protocol.get(this.url, (response) => {
+      const request = this.protocol.get(this.url, (response) => {
         if (response.statusCode < 200 || response.statusCode > 299) {
           reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
         }
