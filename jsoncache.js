@@ -57,4 +57,4 @@ class JSONCache {
     });
   }
 }
-module.export = JSONCache;
+module.exports = JSONCache;
