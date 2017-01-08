@@ -1,6 +1,6 @@
 {
   "name": "json-fetch-cache",
-  "version": "0.0.1",
+  "version": "0.0.3-alpha",
   "description": "Utility for fetching and caching JSON for a configurable amount of time",
   "main": "jsoncache.js",
   "scripts": {
