@@ -26,10 +26,7 @@ class JSONCache {
   }
 
   getDataJson() {
-    if (this.updating) {
-      return this.updating.then(data => JSON.parse(data));
-    }
-    return this.Promise.resolve(JSON.parse(this.currentData));
+    return this.getData().then(data => JSON.parse(data));
   }
 
   update() {
