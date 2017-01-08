@@ -4,7 +4,7 @@ const http = require('http');
 const https = require('https');
 
 class JSONCache {
-  constructor(url, timeout) {
+  constructor(url, timeout, promiseLib = Promise) {
     this.url = url;
     this.protocol = this.url.startsWith('https') ? https : http;
 
@@ -12,6 +12,7 @@ class JSONCache {
     this.currentData = null;
     this.lastUpdated = null;
     this.updating = null;
+    this.Promise = promiseLib;
 
     this.updateInterval = setInterval(() => this.update(), this.timeout);
     this.update();
@@ -21,14 +22,14 @@ class JSONCache {
     if (this.updating) {
       return this.updating;
     }
-    return Promise.resolve(this.currentData);
+    return this.Promise.resolve(this.currentData);
   }
 
   getDataJson() {
     if (this.updating) {
       return this.updating.then(data => JSON.parse(data));
     }
-    return Promise.resolve(JSON.parse(this.currentData));
+    return this.Promise.resolve(JSON.parse(this.currentData));
   }
 
   update() {
@@ -44,7 +45,7 @@ class JSONCache {
   }
 
   httpGet() {
-    return new Promise((resolve, reject) => {
+    return new this.Promise((resolve, reject) => {
       const request = this.protocol.get(this.url, (response) => {
         if (response.statusCode < 200 || response.statusCode > 299) {
           reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
