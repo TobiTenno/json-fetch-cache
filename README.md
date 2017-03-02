@@ -4,7 +4,7 @@ A simple package for fetching JSON from a URL and caching it for a decided amoun
 
 ## Documentation
 
-https://aliasfalse.github.io/warframe-nexus-query
+https://aliasfalse.github.io/json-fetch-cache
 
 ## Installation
 ```bash
