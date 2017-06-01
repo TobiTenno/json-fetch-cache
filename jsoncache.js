@@ -4,11 +4,12 @@ const http = require('http');
 const https = require('https');
 
 class JSONCache {
-  constructor(url, timeout, promiseLib = Promise) {
+  constructor(url, timeout, promiseLib = Promise, maxRetry) {
     this.url = url;
     this.protocol = this.url.startsWith('https') ? https : http;
 
     this.timeout = timeout;
+    this.retryCount = maxRetry || 30;
     this.currentData = null;
     this.lastUpdated = null;
     this.updating = null;
@@ -45,7 +46,12 @@ class JSONCache {
     return new this.Promise((resolve, reject) => {
       const request = this.protocol.get(this.url, (response) => {
         if (response.statusCode < 200 || response.statusCode > 299) {
-          reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
+          if (response.statusCode > 499 && this.retryCount < 30) {
+            this.retryCount++;
+            setTimeout(() => this.httpGet().then(resolve), 1000);
+          } else {
+            reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
+          }
         }
         const body = [];
         response.on('data', chunk => body.push(chunk));
