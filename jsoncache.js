@@ -9,7 +9,8 @@ class JSONCache {
     this.protocol = this.url.startsWith('https') ? https : http;
 
     this.timeout = timeout;
-    this.retryCount = maxRetry || 30;
+    this.maxRetry = maxRetry || 30;
+    this.retryCount = 0;
     this.currentData = null;
     this.lastUpdated = null;
     this.updating = null;
@@ -45,6 +46,8 @@ class JSONCache {
   httpGet() {
     return new this.Promise((resolve, reject) => {
       const request = this.protocol.get(this.url, (response) => {
+        const body = [];
+
         if (response.statusCode < 200 || response.statusCode > 299) {
           if (response.statusCode > 499 && this.retryCount < 30) {
             this.retryCount++;
@@ -53,9 +56,13 @@ class JSONCache {
             reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
           }
         }
-        const body = [];
-        response.on('data', chunk => body.push(chunk));
-        response.on('end', () => resolve(body.join('')));
+
+        else {
+          response.on('data', chunk => body.push(chunk));
+          response.on('end', () => {
+            resolve(body.join(''))
+          });
+        }
       });
       request.on('error', err => reject(err));
     });
