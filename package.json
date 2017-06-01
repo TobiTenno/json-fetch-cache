@@ -1,6 +1,6 @@
 {
   "name": "json-fetch-cache",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Utility for fetching and caching JSON for a configurable amount of time",
   "main": "jsoncache.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "homepage":"https://aliasfalse.github.io/json-fetch-cache",
   "bugs": {
     "url": "https://github.com/aliasfalse/json-fetch-cache/issues",
-    "email": "matej@voboril.org"
+    "email": "tobiah@protonmail.org"
   },
   "repository": {
     "type": "git",
