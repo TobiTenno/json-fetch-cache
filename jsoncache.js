@@ -58,7 +58,8 @@ class JSONCache {
         } else {
           response.on('data', chunk => body.push(chunk));
           response.on('end', () => {
-            resolve(body.join(''))
+            this.retryCount = 0;
+            resolve(body.join(''));
           });
         }
       });
