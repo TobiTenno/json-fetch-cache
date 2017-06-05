@@ -3,6 +3,8 @@
 const http = require('http');
 const https = require('https');
 
+const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '').split(',').map(code => parseInt(code.trim(), 10)));
+
 class JSONCache {
   constructor(url, timeout, promiseLib = Promise, maxRetry = 30) {
     this.url = url;
@@ -49,8 +51,9 @@ class JSONCache {
         const body = [];
 
         if (response.statusCode < 200 || response.statusCode > 299) {
-          if (response.statusCode > 499 && this.retryCount < 30) {
-            this.retryCount++;
+          if ((response.statusCode > 499 || retryCodes.indexOf(response.statusCode) > -1)
+            && this.retryCount < 30) {
+            this.retryCount += 1;
             setTimeout(() => this.httpGet().then(resolve), 1000);
           } else {
             reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
@@ -63,7 +66,7 @@ class JSONCache {
           });
         }
       });
-      request.on('error', err => reject(err));
+      request.on('error', err => reject(`Error code: ${err.statusCode} on request on ${this.url}`));
     });
   }
 }
