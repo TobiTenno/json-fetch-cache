@@ -5,6 +5,15 @@ const https = require('https');
 
 const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '').split(',').map(code => parseInt(code.trim(), 10)));
 
+function isJson(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
 class JSONCache {
   constructor(url, timeout, promiseLib = Promise, maxRetry = 30) {
     this.url = url;
@@ -30,23 +39,36 @@ class JSONCache {
   }
 
   getDataJson() {
-    return this.getData().then(data => JSON.parse(data));
-  }
-
-  update() {
-    this.updating = this.httpGet().then((data) => {
-      this.lastUpdated = Date.now();
-      this.currentData = data;
-      this.updating = null;
-      return this.currentData;
-    }).catch((err) => {
-      this.updating = null;
-      throw err;
+    return this.getData().then((data) => {
+      try {
+        if (isJson(data)) {
+          return JSON.parse(data);
+        }
+        return {};
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+        return {};
+      }
     });
   }
 
+  update() {
+    this.updating = this.httpGet()
+      .then((data) => {
+        this.lastUpdated = Date.now();
+        this.currentData = data;
+        this.updating = null;
+        return this.currentData;
+      })
+      .catch((err) => {
+        this.updating = null;
+        throw err;
+      });
+  }
+
   httpGet() {
-    return new this.Promise((resolve, reject) => {
+    return new this.Promise((resolve) => {
       const request = this.protocol.get(this.url, (response) => {
         const body = [];
 
@@ -54,9 +76,12 @@ class JSONCache {
           if ((response.statusCode > 499 || retryCodes.indexOf(response.statusCode) > -1)
             && this.retryCount < 30) {
             this.retryCount += 1;
-            setTimeout(() => this.httpGet().then(resolve), 1000);
+            // eslint-disable-next-line no-console
+            setTimeout(() => this.httpGet().then(resolve).catch(console.error), 1000);
           } else {
-            reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
+            // eslint-disable-next-line no-console
+            console.error(`${response.statusCode}: Failed to load ${this.url}`);
+            resolve('[]');
           }
         } else {
           response.on('data', chunk => body.push(chunk));
@@ -66,7 +91,11 @@ class JSONCache {
           });
         }
       });
-      request.on('error', err => reject(`Error code: ${err.statusCode} on request on ${this.url}`));
+      request.on('error', (err) => {
+        // eslint-disable-next-line no-console
+        console.error(`${err.statusCode}: ${this.url}`);
+        resolve('[]');
+      });
     });
   }
 }
