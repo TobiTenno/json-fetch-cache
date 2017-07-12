@@ -5,6 +5,15 @@ const https = require('https');
 
 const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '').split(',').map(code => parseInt(code.trim(), 10)));
 
+function isJson(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
 class JSONCache {
   constructor(url, timeout, promiseLib = Promise, maxRetry = 30) {
     this.url = url;
@@ -30,7 +39,18 @@ class JSONCache {
   }
 
   getDataJson() {
-    return this.getData().then(data => JSON.parse(data));
+    return this.getData().then((data) => {
+      try {
+        if (isJson(data)) {
+          return JSON.parse(data);
+        }
+        return {};
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+        return {};
+      }
+    });
   }
 
   update() {
