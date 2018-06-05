@@ -6,6 +6,7 @@
   "scripts": {
     "test": "eslint src jsoncache.js && mocha",
     "build-docs": "./node_modules/.bin/jsdoc -t ./node_modules/ink-docstrap/template -c jsdoc.conf -R README.md -r jsoncache.js -d docs",
+    "travis-deploy-once": "travis-deploy-once",
     "semantic-release": "semantic-release"
   },
   "keywords": [
@@ -15,7 +16,8 @@
   "author": "TobiTenno",
   "license": "Apache-2.0",
   "dependencies": {
-    "greenkeeper-lockfile": "^1.15.1"
+    "greenkeeper-lockfile": "^1.15.1",
+    "travis-deploy-once": "^5.0.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
