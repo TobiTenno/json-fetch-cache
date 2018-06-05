@@ -19,7 +19,7 @@ before_install:
 after_script: greenkeeper-lockfile-upload
 
 after_success:
-  - npm run travis-deploy-once "npm run semantic-release"
+  - npm run travis-deploy-once --travis-url "https://travis-ci.com" "npm run semantic-release"
 
 branches:
   except:
