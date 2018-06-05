@@ -6,7 +6,7 @@
   "scripts": {
     "test": "eslint src jsoncache.js && mocha",
     "build-docs": "./node_modules/.bin/jsdoc -t ./node_modules/ink-docstrap/template -c jsdoc.conf -R README.md -r jsoncache.js -d docs",
-    "travis-deploy-once": "travis-deploy-once",
+    "travis-deploy-once": "travis-deploy-once --pro",
     "semantic-release": "semantic-release"
   },
   "keywords": [
