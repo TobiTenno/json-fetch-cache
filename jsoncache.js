@@ -3,7 +3,8 @@
 const http = require('http');
 const https = require('https');
 
-const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '').split(',').map(code => parseInt(code.trim(), 10)));
+const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
+  .split(',').map(code => parseInt(code.trim(), 10)));
 
 function isJson(str) {
   try {
@@ -97,6 +98,10 @@ class JSONCache {
         resolve('[]');
       });
     });
+  }
+
+  stop() {
+    clearInterval(this.updateInterval);
   }
 }
 module.exports = JSONCache;

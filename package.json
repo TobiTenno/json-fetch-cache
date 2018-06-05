@@ -4,31 +4,39 @@
   "description": "Utility for fetching and caching JSON for a configurable amount of time",
   "main": "jsoncache.js",
   "scripts": {
-    "test": "node_modules/.bin/eslint src/ test/ && node_modules/.bin/mocha",
-    "build-docs": "node_modules/.bin/jsdoc -t ./node_modules/ink-docstrap/template -c jsdoc.conf -R README.md -r jsoncache.js -d docs"
+    "test": "eslint src jsoncache.js && mocha",
+    "build-docs": "node_modules/.bin/jsdoc -t ./node_modules/ink-docstrap/template -c jsdoc.conf -R README.md -r jsoncache.js -d docs",
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "json",
     "cache"
   ],
-  "author": "tobiah",
-  "license": "ISC",
-  "dependencies": {},
-  "devDependencies" : {
-    "eslint": "^3.7.1",
-    "eslint-config-airbnb": "^12.0.0",
-    "eslint-plugin-import": "^1.16.0",
-    "eslint-plugin-jsx-a11y": "^2.2.2",
-    "eslint-plugin-react": "^6.3.0",
-    "ink-docstrap": "^1.3.0"
+  "author": "TobiTenno",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "greenkeeper-lockfile": "^1.15.1"
   },
-  "homepage":"https://aliasfalse.github.io/json-fetch-cache",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "decache": "^4.4.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-import-resolver-node": "^0.3.2",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "ink-docstrap": "^1.3.0",
+    "mocha": "^5.2.0",
+    "semantic-release": "^15.5.0"
+  },
+  "homepage": "https://tobitenno.github.io/json-fetch-cache",
   "bugs": {
-    "url": "https://github.com/aliasfalse/json-fetch-cache/issues",
+    "url": "https://github.com/tobitenno/json-fetch-cache/issues",
     "email": "tobiah@protonmail.org"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aliasfalse/json-fetch-cache.git"
+    "url": "https://github.com/tobitenno/json-fetch-cache.git"
   }
 }
