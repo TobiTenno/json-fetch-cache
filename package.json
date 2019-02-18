@@ -30,7 +30,7 @@
     "eslint-plugin-react": "^7.12.4",
     "ink-docstrap": "^1.3.0",
     "jsdoc": "^3.5.5",
-    "mocha": "^5.2.0",
+    "mocha": "^6.0.0",
     "semantic-release": "^15.5.0"
   },
   "homepage": "https://tobitenno.github.io/json-fetch-cache",
