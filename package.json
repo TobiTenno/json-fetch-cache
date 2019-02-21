@@ -4,7 +4,7 @@
   "description": "Utility for fetching and caching JSON for a configurable amount of time",
   "main": "jsoncache.js",
   "scripts": {
-    "test": "eslint src jsoncache.js && mocha",
+    "test": "eslint jsoncache.js && mocha",
     "build-docs": "./node_modules/.bin/jsdoc -t ./node_modules/ink-docstrap/template -c jsdoc.conf -R README.md -r jsoncache.js -d docs",
     "travis-deploy-once": "travis-deploy-once --pro",
     "semantic-release": "semantic-release"
