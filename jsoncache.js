@@ -1,38 +1,45 @@
 'use strict';
 
+const EventEmitter = require('events');
+
 const http = require('http');
 const https = require('https');
 
 const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
   .split(',').map(code => parseInt(code.trim(), 10)));
 
-function isJson(str) {
-  try {
-    JSON.parse(str);
-  } catch (e) {
-    return false;
-  }
-  return true;
-}
-
-class JSONCache {
-  constructor(url, timeout, promiseLib = Promise, maxRetry = 30) {
+class JSONCache extends EventEmitter {
+  constructor(url, timeout, {
+    parser = JSON.parse, promiseLib = Promise, logger, delayStart = true,
+    opts, maxListeners = 45, useEmitter = true, maxRetry = 30,
+  }) {
+    super();
     this.url = url;
     this.protocol = this.url.startsWith('https') ? https : http;
 
-    this.timeout = timeout;
     this.maxRetry = maxRetry;
-    this.retryCount = 0;
+    this.timeout = timeout;
     this.currentData = null;
-    this.lastUpdated = null;
     this.updating = null;
     this.Promise = promiseLib;
-
-    this.updateInterval = setInterval(() => this.update(), this.timeout);
-    this.update();
+    this.parser = parser;
+    this.hash = null;
+    this.logger = logger;
+    this.delayStart = delayStart;
+    this.opts = opts;
+    this.useEmitter = useEmitter;
+    if (useEmitter) {
+      this.setMaxListeners(maxListeners);
+    }
+    if (!delayStart) {
+      this.startUpdating();
+    }
   }
 
   getData() {
+    if (this.delayStart) {
+      this.startUpdating();
+    }
     if (this.updating) {
       return this.updating;
     }
@@ -40,32 +47,22 @@ class JSONCache {
   }
 
   getDataJson() {
-    return this.getData().then((data) => {
-      try {
-        if (isJson(data)) {
-          return JSON.parse(data);
-        }
-        return {};
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e);
-        return {};
-      }
-    });
+    return this.getData();
   }
 
   update() {
-    this.updating = this.httpGet()
-      .then((data) => {
-        this.lastUpdated = Date.now();
-        this.currentData = data;
-        this.updating = null;
-        return this.currentData;
-      })
-      .catch((err) => {
-        this.updating = null;
-        throw err;
-      });
+    this.updating = this.httpGet().then(async (data) => {
+      this.currentData = this.parser(data, this.opts);
+      if (this.useEmitter) {
+        setTimeout(async () => this.emit('update', await this.currentData), 2000);
+      }
+
+      this.updating = null;
+      return this.currentData;
+    }).catch((err) => {
+      this.updating = null;
+      throw err;
+    });
   }
 
   httpGet() {
@@ -102,6 +99,10 @@ class JSONCache {
 
   stop() {
     clearInterval(this.updateInterval);
+  }
+
+  stopUpdating() {
+    this.stop();
   }
 }
 module.exports = JSONCache;
