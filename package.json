@@ -46,31 +46,29 @@
     "url": "https://github.com/tobitenno/json-fetch-cache.git"
   },
   "release": {
-    "monorepo": {
-      "analyzeCommits": {
-        "preset": "angular",
-        "releaseRules": [
-          {
-            "type": "docs",
-            "scope": "README",
-            "release": "patch"
-          },
-          {
-            "type": "breaking",
-            "release": "major"
-          },
-          {
-            "type": "major",
-            "release": "major"
-          }
-        ],
-        "parserOpts": {
-          "noteKeywords": [
-            "BREAKING CHANGE",
-            "BREAKING CHANGES",
-            "BREAKING"
-          ]
+    "analyzeCommits": {
+      "preset": "angular",
+      "releaseRules": [
+        {
+          "type": "docs",
+          "scope": "README",
+          "release": "patch"
+        },
+        {
+          "type": "breaking",
+          "release": "major"
+        },
+        {
+          "type": "major",
+          "release": "major"
         }
+      ],
+      "parserOpts": {
+        "noteKeywords": [
+          "BREAKING CHANGE",
+          "BREAKING CHANGES",
+          "BREAKING"
+        ]
       }
     }
   }
