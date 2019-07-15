@@ -9,9 +9,18 @@ const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
   .split(',').map(code => parseInt(code.trim(), 10)));
 
 class JSONCache extends EventEmitter {
-  constructor(url, timeout, {
+  constructor(url, timeout = 60000, {
     parser = JSON.parse, promiseLib = Promise, logger, delayStart = true,
     opts, maxListeners = 45, useEmitter = true, maxRetry = 30,
+  } = {
+    parser: JSON.parse,
+    promiseLib: Promise,
+    logger: console,
+    delayStart: true,
+    opts: {},
+    maxListeners: 45,
+    useEmitter: true,
+    maxRetry: 30,
   }) {
     super();
     this.url = url;
@@ -95,6 +104,11 @@ class JSONCache extends EventEmitter {
         resolve('[]');
       });
     });
+  }
+
+  startUpdating() {
+    this.updateInterval = setInterval(() => this.update(), this.timeout);
+    this.update();
   }
 
   stop() {
