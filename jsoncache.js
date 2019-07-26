@@ -10,7 +10,7 @@ const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
 
 class JSONCache extends EventEmitter {
   constructor(url, timeout = 60000, {
-    parser = JSON.parse, promiseLib = Promise, logger, delayStart = true,
+    parser = JSON.parse, promiseLib = Promise, logger = console, delayStart = true,
     opts, maxListeners = 45, useEmitter = true, maxRetry = 30,
   } = {
     parser: JSON.parse,
@@ -77,17 +77,16 @@ class JSONCache extends EventEmitter {
   httpGet() {
     return new this.Promise((resolve) => {
       const request = this.protocol.get(this.url, (response) => {
+        this.logger.info(`beginning request to ${this.url}`);
         const body = [];
 
         if (response.statusCode < 200 || response.statusCode > 299) {
-          if ((response.statusCode > 499 || retryCodes.indexOf(response.statusCode) > -1)
+          if ((response.statusCode > 499 || retryCodes.includes(response.statusCode))
             && this.retryCount < this.maxRetry) {
             this.retryCount += 1;
-            // eslint-disable-next-line no-console
-            setTimeout(() => this.httpGet().then(resolve).catch(console.error), 1000);
+            setTimeout(() => this.httpGet().then(resolve).catch(this.logger.error), 1000);
           } else {
-            // eslint-disable-next-line no-console
-            console.error(`${response.statusCode}: Failed to load ${this.url}`);
+            this.logger.error(`${response.statusCode}: Failed to load ${this.url}`);
             resolve('[]');
           }
         } else {
@@ -99,8 +98,7 @@ class JSONCache extends EventEmitter {
         }
       });
       request.on('error', (err) => {
-        // eslint-disable-next-line no-console
-        console.error(`${err.statusCode}: ${this.url}`);
+        this.logger.error(`${err.statusCode}: ${this.url}`);
         resolve('[]');
       });
     });
