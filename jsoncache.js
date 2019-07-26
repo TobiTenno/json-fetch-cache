@@ -81,7 +81,7 @@ class JSONCache extends EventEmitter {
 
         if (response.statusCode < 200 || response.statusCode > 299) {
           if ((response.statusCode > 499 || retryCodes.indexOf(response.statusCode) > -1)
-            && this.retryCount < 30) {
+            && this.retryCount < this.maxRetry) {
             this.retryCount += 1;
             // eslint-disable-next-line no-console
             setTimeout(() => this.httpGet().then(resolve).catch(console.error), 1000);
