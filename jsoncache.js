@@ -2,16 +2,28 @@
 
 const EventEmitter = require('events');
 
-const http = require('http');
-const https = require('https');
-
 const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
   .split(',').map(code => parseInt(code.trim(), 10)));
 
 class JSONCache extends EventEmitter {
+  /**
+   * Make a new cache
+   * @param {string}  url               url to fetch
+   * @param {number}  [timeout=60000]   optional timeout
+   * @param {[type]}  parser            optional parser to parse data. defaults to JSON.parse
+   * @param {[type]}  promiseLib        optional promise library override
+   * @param {[type]}  logger            optional Logger
+   * @param {[type]}  delayStart        whether or not to delay starting updating the cache
+   *                                        until start is requested
+   * @param {[type]}  opts              options to pass to the parser
+   * @param {[type]}  maxListeners      maximum listeners (only applicable if leveraging emitter)
+   * @param {[type]}  useEmitter        whether or not to use the optional node emitter
+   * @param {[type]}  maxRetry          maximum number of attempts to retry getting data
+   * @param {[type]}  integrity         optional function to check if the data is worth keeping
+   */
   constructor(url, timeout = 60000, {
     parser = JSON.parse, promiseLib = Promise, logger = console, delayStart = true,
-    opts, maxListeners = 45, useEmitter = true, maxRetry = 30,
+    opts, maxListeners = 45, useEmitter = true, maxRetry = 30, integrity = () => true,
   } = {
     parser: JSON.parse,
     promiseLib: Promise,
@@ -21,10 +33,12 @@ class JSONCache extends EventEmitter {
     maxListeners: 45,
     useEmitter: true,
     maxRetry: 30,
+    integrity: () => true,
   }) {
     super();
     this.url = url;
-    this.protocol = this.url.startsWith('https') ? https : http;
+    // eslint-disable-next-line global-require
+    this.protocol = this.url.startsWith('https') ? require('https') : require('http');
 
     this.maxRetry = maxRetry;
     this.timeout = timeout;
@@ -37,6 +51,7 @@ class JSONCache extends EventEmitter {
     this.delayStart = delayStart;
     this.opts = opts;
     this.useEmitter = useEmitter;
+    this.integrity = integrity;
     if (useEmitter) {
       this.setMaxListeners(maxListeners);
     }
@@ -61,7 +76,11 @@ class JSONCache extends EventEmitter {
 
   update() {
     this.updating = this.httpGet().then(async (data) => {
-      this.currentData = this.parser(data, this.opts);
+      const parsed = this.parser(data, this.opts);
+      if (!this.integrity(parsed)) return this.currentData;
+
+      // data passed integrity check
+      this.currentData = parsed;
       if (this.useEmitter) {
         setTimeout(async () => this.emit('update', await this.currentData), 2000);
       }
