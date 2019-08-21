@@ -96,7 +96,7 @@ class JSONCache extends EventEmitter {
   httpGet() {
     return new this.Promise((resolve) => {
       const request = this.protocol.get(this.url, (response) => {
-        this.logger.info(`beginning request to ${this.url}`);
+        this.logger.debug(`beginning request to ${this.url}`);
         const body = [];
 
         if (response.statusCode < 200 || response.statusCode > 299) {
