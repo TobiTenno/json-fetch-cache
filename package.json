@@ -28,7 +28,7 @@
     "greenkeeper-lockfile": "^1.15.1",
     "ink-docstrap": "^1.3.0",
     "jsdoc": "^3.6.3",
-    "mocha": "^6.1.4",
+    "mocha": "^7.0.1",
     "semantic-release": "^15.13.19",
     "travis-deploy-once": "^5.0.11"
   },
