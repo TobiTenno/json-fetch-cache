@@ -45,7 +45,7 @@ jobs:
         script: npx semantic-release
     - stage: docs
       script:
-        - chmod +x ./github/update_docs.sh
+        - chmod +x ./.github/update_docs.sh
         - ./.github/update_docs.sh
 
 install: npm install
