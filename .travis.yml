@@ -40,7 +40,6 @@ jobs:
       deploy:
         provider: script
         cleanup: false
-        script:
-          - npx semantic-release
+        script: npx semantic-release
 
 install: npm install
