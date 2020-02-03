@@ -20,6 +20,8 @@ stages:
     if: branch =~ /^greenkeeper.*$/
   - name: release
     if: branch = master && type NOT IN (pull_request)
+  - name: docs
+    if: branch = master && type NOT IN (pull_request)
 
 jobs:
   include:
@@ -41,5 +43,9 @@ jobs:
         provider: script
         cleanup: false
         script: npx semantic-release
+    - stage: docs
+      script:
+        - chmod +x ./github/update_docs.sh
+        - ./.github/update_docs.sh
 
 install: npm install
