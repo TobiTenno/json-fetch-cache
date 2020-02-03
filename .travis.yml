@@ -1,5 +1,7 @@
 language: node_js
 
+os: linux
+
 cache:
   directories:
     - ~/.npm
@@ -37,7 +39,7 @@ jobs:
       node_js: node
       deploy:
         provider: script
-        skip_cleanup: true
+        cleanup: false
         script:
           - npx semantic-release
 
