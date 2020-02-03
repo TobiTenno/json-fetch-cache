@@ -74,8 +74,6 @@
         JSONCache
         </h2>
         
-            <div class="class-description">Represents a JSON Cache</div>
-        
     
 </header>
 
@@ -86,7 +84,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="JSONCache"><span class="type-signature"></span>new JSONCache(url, maximumCacheTime)</h4>
+    <h4 class="name" id="JSONCache"><span class="type-signature"></span>new JSONCache(url [, timeout], parser, promiseLib, logger, delayStart, opts, maxListeners, useEmitter, maxRetry, integrity)</h4>
     
     
 </dt>
@@ -94,7 +92,7 @@
 
     
     <div class="description">
-        Represents a JSONCache
+        Make a new cache
     </div>
     
 
@@ -117,7 +115,11 @@
         <th>Type</th>
 
         
+        <th>Argument</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -143,17 +145,29 @@
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
             
 
-            <td class="description last">URL for the location of the remote json</td>
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">url to fetch</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>maximumCacheTime</code></td>
+                <td class="name"><code>timeout</code></td>
             
 
             <td class="type">
@@ -167,10 +181,351 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
             
 
-            <td class="description last">The maximum amount of time that the cache should be allowed to be stale</td>
+            
+                <td class="default">
+                
+                    60000
+                
+                </td>
+            
+
+            <td class="description last">optional timeout</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>parser</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">optional parser to parse data. defaults to JSON.parse</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>promiseLib</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Class</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">optional promise library override</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>logger</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">optional Logger</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>delayStart</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">whether or not to delay starting updating the cache
+                                       until start is requested</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">options to pass to the parser</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maxListeners</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">maximum listeners (only applicable if leveraging emitter)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>useEmitter</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">whether or not to use the optional node emitter</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maxRetry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">maximum number of attempts to retry getting data</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>integrity</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">optional function to check if the data is worth keeping</td>
         </tr>
 
     
@@ -215,7 +570,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="jsoncache.js.html">jsoncache.js</a>,
-				 <a href="jsoncache.js.html#sunlight-1-line-7">line 7</a>
+				 <a href="jsoncache.js.html#sunlight-1-line-24">line 24</a>
 			</li>
 		</ul>
 	</dd>
@@ -259,118 +614,6 @@
 
     
 
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-            
-<hr>
-<dt>
-    <h4 class="name" id="getData"><span class="type-signature"></span>getData()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the cached data
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="jsoncache.js.html">jsoncache.js</a>,
-				 <a href="jsoncache.js.html#sunlight-1-line-146">line 146</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise.&lt;json></span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        </dl>
     
 
     
@@ -418,9 +661,9 @@
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
 	
-		on Wednesday, October 19th 2016, 17:45:37
+		on Monday, February 3rd 2020, 20:33:18
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

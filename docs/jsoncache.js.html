@@ -71,163 +71,141 @@
     <article>
         <pre
             class="sunlight-highlight-javascript linenums">'use strict';
-const request = require('request-promise');
 
-/**
- * Represents a JSON Cache
- */
-class JSONCache {
-  
+const EventEmitter = require('events');
+
+const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
+  .split(',').map(code => parseInt(code.trim(), 10)));
+
+class JSONCache extends EventEmitter {
   /**
-   * Represents a JSONCache
-   * @constructor
-   * @param {string} url URL for the location of the remote json
-   * @param {number} maximumCacheTime The maximum amount of time that the cache should be allowed to be stale
+   * Make a new cache
+   * @param {string}    url               url to fetch
+   * @param {number}    [timeout=60000]   optional timeout
+   * @param {function}  parser            optional parser to parse data. defaults to JSON.parse
+   * @param {Class}     promiseLib        optional promise library override
+   * @param {Object}    logger            optional Logger
+   * @param {boolean}   delayStart        whether or not to delay starting updating the cache
+   *                                        until start is requested
+   * @param {Object}    opts              options to pass to the parser
+   * @param {number}    maxListeners      maximum listeners (only applicable if leveraging emitter)
+   * @param {boolean}   useEmitter        whether or not to use the optional node emitter
+   * @param {number}    maxRetry          maximum number of attempts to retry getting data
+   * @param {function}  integrity         optional function to check if the data is worth keeping
    */
-  constructor(url, maximumCacheTime) {
-    
-    /**
-     * URL for the cache to fetch from
-     * @type {string}
-     * @private 
-     */
-    this._url              = url;
-    
-    /**
-     * Maximum amount of time to cache data
-     * @type {number}
-     * @private 
-     */
-    this._maximumCacheTime = maximumCacheTime || 3000;
-    
-    /**
-     * The data cache, a JSON formatted object
-     * @type {json}
-     * @private 
-     */
-    this._cache            = null;
-    
-    /**
-     * Date corresponding to the last time the cache was refreshed
-     * @type {Date}
-     * @private 
-     */
-    this._lastRefresh      = null;
-    
-    /**
-     * Whether or not the cache is currently refreshing, 
-     *  determines whether or not the cache will be returned or delayed until refreshed
-     * @type {boolean}
-     * @private 
-     */
-    this._refreshing       = false;
-    
-    /**
-     * An array of refresh functions to be performed
-     * @type {Array&lt;function>}
-     * @private 
-     */
-    this._refreshQueue     = [];
-  }
-  
-  /**
-   * Whether or not the data has expired past the maximumCacheTime
-   * @readonly
-   * @type {boolean}
-   * @private
-   */
-  get dataIsCurrent(){
-    return this._cache &amp;&amp; ((Date.now() - this._cache.creation) &lt; this._maximumCacheTime);
-  }
-  
-  /**
-   * Refresh the cached data
-   * @param {function} Function to push onto the refresh queue if there is currently a refresh in progress
-   * @returns {Promise&lt;string>} describing the status
-   * @private 
-   */
-  refresh(funct) {
-    const self = this;
-    return new Promise((resolve, reject) => {
-      self._refreshQueue.push(funct);
-      if (!self._refreshing) {
-        self._refreshing = true;
-        self.retrieve()
-          .then((data) => {
-            self._cache = data;
-            self._lastRefresh = Date.now();
-            self._refreshing = false;
-            self.processRefreshQueue(data);
-            resolve(data);
-          })
-          .catch(console.error);
-      }
-    });
+  constructor(url, timeout = 60000, {
+    parser = JSON.parse, promiseLib = Promise, logger = console, delayStart = true,
+    opts, maxListeners = 45, useEmitter = true, maxRetry = 30, integrity = () => true,
+  } = {
+    parser: JSON.parse,
+    promiseLib: Promise,
+    logger: console,
+    delayStart: true,
+    opts: {},
+    maxListeners: 45,
+    useEmitter: true,
+    maxRetry: 30,
+    integrity: () => true,
+  }) {
+    super();
+    this.url = url;
+    // eslint-disable-next-line global-require
+    this.protocol = this.url.startsWith('https') ? require('https') : require('http');
+
+    this.maxRetry = maxRetry;
+    this.timeout = timeout;
+    this.currentData = null;
+    this.updating = null;
+    this.Promise = promiseLib;
+    this.parser = parser;
+    this.hash = null;
+    this.logger = logger;
+    this.delayStart = delayStart;
+    this.opts = opts;
+    this.useEmitter = useEmitter;
+    this.integrity = integrity;
+    if (useEmitter) {
+      this.setMaxListeners(maxListeners);
+    }
+    if (!delayStart) {
+      this.startUpdating();
+    }
   }
 
-  /**
-   * Retrieve the most recent data from the specified url
-   * @returns {Promise&lt;json>}
-   * @private
-   */
-  retrieve() {
-    return new Promise((resolve, reject) => {
-      var self = this;
-      request(self._url)
-        .then(function (body) {
-          var data;
-          try {
-            data = JSON.parse(body);
-          }
-          catch (e) {
-            data = null;
-            reject(e);
-          }
-          if (!data) {
-            var error;
-            error = new Error(`Invalid JSON from ${self._url}`);
-            reject (error);
-          }
-          resolve(data);
-        })
-        .catch((error) => {
-            console.error(error);
-        }); 
-    });
-  }
-
-  /**
-   * Process the next entry in the event queue
-   * @returns {Promise&lt;json>}
-   * @private
-   */
-  processRefreshQueue (data) {
-    return new Promise((resolve, reject) => {
-      while (this._refreshQueue.length) {
-        this._refreshQueue.shift()()
-          .then((data) => resolve(data))
-          .catch(console.error);
-      }
-    });
-  }
-  
-  /**
-   * Get the cached data
-   * @returns {Promise&lt;json>}
-   */ 
   getData() {
-    const self = this;
-    return new Promise((resolve, reject) => {
-      if (self.dataIsCurrent !== null &amp;&amp; self.dataIsCurrent) {
-        resolve(self._cache);
-      } else {
-        self.refresh()
-          .then((data) => {
-            resolve(data);
-          })
-          .catch(console.err);
+    if (this.delayStart) {
+      this.startUpdating();
+    }
+    if (this.updating) {
+      return this.updating;
+    }
+    return this.Promise.resolve(this.currentData);
+  }
+
+  getDataJson() {
+    return this.getData();
+  }
+
+  update() {
+    this.updating = this.httpGet().then(async (data) => {
+      const parsed = this.parser(data, this.opts);
+      if (!this.integrity(parsed)) return this.currentData;
+
+      // data passed integrity check
+      this.currentData = parsed;
+      if (this.useEmitter) {
+        setTimeout(async () => this.emit('update', await this.currentData), 2000);
       }
+
+      this.updating = null;
+      return this.currentData;
+    }).catch((err) => {
+      this.updating = null;
+      throw err;
     });
+  }
+
+  httpGet() {
+    return new this.Promise((resolve) => {
+      const request = this.protocol.get(this.url, (response) => {
+        this.logger.debug(`beginning request to ${this.url}`);
+        const body = [];
+
+        if (response.statusCode &lt; 200 || response.statusCode > 299) {
+          if ((response.statusCode > 499 || retryCodes.includes(response.statusCode))
+            &amp;&amp; this.retryCount &lt; this.maxRetry) {
+            this.retryCount += 1;
+            setTimeout(() => this.httpGet().then(resolve).catch(this.logger.error), 1000);
+          } else {
+            this.logger.error(`${response.statusCode}: Failed to load ${this.url}`);
+            resolve('[]');
+          }
+        } else {
+          response.on('data', chunk => body.push(chunk));
+          response.on('end', () => {
+            this.retryCount = 0;
+            resolve(body.join(''));
+          });
+        }
+      });
+      request.on('error', (err) => {
+        this.logger.error(`${err.statusCode}: ${this.url}`);
+        resolve('[]');
+      });
+    });
+  }
+
+  startUpdating() {
+    this.updateInterval = setInterval(() => this.update(), this.timeout);
+    this.update();
+  }
+
+  stop() {
+    clearInterval(this.updateInterval);
+  }
+
+  stopUpdating() {
+    this.stop();
   }
 }
 module.exports = JSONCache;
@@ -270,9 +248,9 @@ module.exports = JSONCache;
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a>
 	
-		on Wednesday, October 19th 2016, 17:45:32
+		on Monday, February 3rd 2020, 20:33:18
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
