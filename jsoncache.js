@@ -8,18 +8,18 @@ const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
 class JSONCache extends EventEmitter {
   /**
    * Make a new cache
-   * @param {string}  url               url to fetch
-   * @param {number}  [timeout=60000]   optional timeout
-   * @param {[type]}  parser            optional parser to parse data. defaults to JSON.parse
-   * @param {[type]}  promiseLib        optional promise library override
-   * @param {[type]}  logger            optional Logger
-   * @param {[type]}  delayStart        whether or not to delay starting updating the cache
+   * @param {string}    url               url to fetch
+   * @param {number}    [timeout=60000]   optional timeout
+   * @param {function}  parser            optional parser to parse data. defaults to JSON.parse
+   * @param {Class}     promiseLib        optional promise library override
+   * @param {Object}    logger            optional Logger
+   * @param {boolean}   delayStart        whether or not to delay starting updating the cache
    *                                        until start is requested
-   * @param {[type]}  opts              options to pass to the parser
-   * @param {[type]}  maxListeners      maximum listeners (only applicable if leveraging emitter)
-   * @param {[type]}  useEmitter        whether or not to use the optional node emitter
-   * @param {[type]}  maxRetry          maximum number of attempts to retry getting data
-   * @param {[type]}  integrity         optional function to check if the data is worth keeping
+   * @param {Object}    opts              options to pass to the parser
+   * @param {number}    maxListeners      maximum listeners (only applicable if leveraging emitter)
+   * @param {boolean}   useEmitter        whether or not to use the optional node emitter
+   * @param {number}    maxRetry          maximum number of attempts to retry getting data
+   * @param {function}  integrity         optional function to check if the data is worth keeping
    */
   constructor(url, timeout = 60000, {
     parser = JSON.parse, promiseLib = Promise, logger = console, delayStart = true,
