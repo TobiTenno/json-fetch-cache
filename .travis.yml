@@ -17,7 +17,7 @@ stages:
   - name: greenkeeper
     if: branch =~ /^greenkeeper.*$/
   - name: release
-    if: branch = /^master$/ # only run on master
+    if: branch =~ /^master$/
 
 jobs:
   include:
