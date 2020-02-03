@@ -1,29 +1,51 @@
 language: node_js
 
+os: linux
+
 cache:
   directories:
     - ~/.npm
 notifications:
     email: false
+
 node_js:
   - "node"
   - "lts/*"
 
-before_script:
-  - greenkeeper-lockfile-update
+stages:
+  - name: lint
+  - name: test
+  - name: coverage
+  - name: greenkeeper
+    if: branch =~ /^greenkeeper.*$/
+  - name: release
+    if: branch = master && type NOT IN (pull_request)
+  - name: docs
+    if: branch = master && type NOT IN (pull_request)
 
-before_install:
-- npm install -g npm
-- npm install -g greenkeeper-lockfile@1
+jobs:
+  include:
+    - stage: lint
+      script: npm run lint
+    - stage: test
+      script: npm test
+    - stage: coverage
+      script: npm run coverage
+    - stage: greenkeeper
+      before_install: npm i -g greenkeeper-lockfile
+      install: npm i
+      script:
+        - greenkeeper-lockfile-update
+        - greenkeeper-lockfile-upload
+    - stage: release
+      node_js: node
+      deploy:
+        provider: script
+        cleanup: false
+        script: npx semantic-release
+    - stage: docs
+      script:
+        - chmod +x ./github/update_docs.sh
+        - ./.github/update_docs.sh
 
-after_script: greenkeeper-lockfile-upload
-
-after_success:
-  - npm run travis-deploy-once "npm run semantic-release"
-
-branches:
-  except:
-    - /^v\d+\.\d+\.\d+$/
-
-#override npm ci for now
 install: npm install
