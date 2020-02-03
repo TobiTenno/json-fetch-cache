@@ -19,7 +19,8 @@ stages:
   - name: greenkeeper
     if: branch =~ /^greenkeeper.*$/
   - name: release
-    if: branch =~ /^master$/
+    if: branch =~ /^master$/ AND \
+        NOT type IN (pull_request)
 
 jobs:
   include:
