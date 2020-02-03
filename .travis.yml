@@ -11,11 +11,13 @@ node_js:
   - "lts/*"
 
 stages:
-  - lint
-  - test
-  - coverage
-  - greenkeeper
-  - release
+  - name: lint
+  - name: test
+  - name: coverage
+  - name: greenkeeper
+    if: branch =~ /^greenkeeper.*$/
+  - name: release
+    if: branch = /^master$/ # only run on master
 
 jobs:
   include:
@@ -26,9 +28,8 @@ jobs:
     - stage: coverage
       script: npm run coverage
     - stage: greenkeeper
-      if: branch =~ /^greenkeeper.*$/ # only run if in a greenkeeper branch
       before_install: npm i -g greenkeeper-lockfile
-      install: npm i # always run full install for greenkeeper
+      install: npm i
       script:
         - greenkeeper-lockfile-update
         - greenkeeper-lockfile-upload
