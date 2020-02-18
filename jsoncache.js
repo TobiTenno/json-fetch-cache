@@ -5,38 +5,47 @@ const EventEmitter = require('events');
 const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
   .split(',').map(code => parseInt(code.trim(), 10)));
 
+const defaultOpts = {
+  parser: JSON.parse,
+  promiseLib: Promise,
+  logger: console,
+  delayStart: false,
+  opts: {},
+  maxListeners: 10,
+  useEmitter: false,
+  maxRetry: 1,
+  integrity: () => true,
+};
+
 class JSONCache extends EventEmitter {
   /**
    * Make a new cache
-   * @param {string}    url               url to fetch
-   * @param {number}    [timeout=60000]   optional timeout
-   * @param {Object}    opts              Options object
-   * @param {function}  opts.parser       optional parser to parse data. defaults to JSON.parse
-   * @param {Class}     opts.promiseLib   optional promise library override
-   * @param {Object}    opts.logger       optional Logger
-   * @param {boolean}   opts.delayStart   whether or not to delay starting updating the cache
-   *                                        until start is requested
-   * @param {Object}    opts.opts         options to pass to the parser
-   * @param {number}    opts.maxListeners maximum listeners (only applicable if leveraging emitter)
-   * @param {boolean}   opts.useEmitter   whether or not to use the optional node emitter
-   * @param {number}    opts.maxRetry     maximum number of attempts to retry getting data
-   * @param {function}  opts.integrity    optional function to check if the data is worth keeping
+   * @param {string}    url                  url to fetch
+   * @param {number}    [timeout=60000]      optional timeout
+   * @param {Object}    options              Options object
+   * @param {function}  options.parser       optional parser to parse data. defaults to JSON.parse
+   * @param {Class}     options.promiseLib   optional promise library override
+   * @param {Object}    options.logger       optional Logger
+   * @param {boolean}   options.delayStart   whether or not to delay starting updating the cache
+   *                                            until start is requested
+   * @param {Object}    options.opts         options to pass to the parser
+   * @param {number}    options.maxListeners maximum listeners
+   *                                            (only applicable if leveraging emitter)
+   * @param {boolean}   options.useEmitter   whether or not to use the optional node emitter
+   * @param {number}    options.maxRetry     maximum number of attempts to retry getting data
+   * @param {function}  options.integrity    optional function to check if the data is worth keeping
    */
-  constructor(url, timeout = 60000, {
-    parser = JSON.parse, promiseLib = Promise, logger = console, delayStart = true,
-    opts, maxListeners = 45, useEmitter = true, maxRetry = 30, integrity = () => true,
-  } = {
-    parser: JSON.parse,
-    promiseLib: Promise,
-    logger: console,
-    delayStart: true,
-    opts: {},
-    maxListeners: 45,
-    useEmitter: true,
-    maxRetry: 30,
-    integrity: () => true,
-  }) {
+  constructor(url, timeout = 60000, options) {
     super();
+
+    // eslint-disable-next-line no-param-reassign
+    const {
+      parser, promiseLib, logger, delayStart, opts, maxListeners, useEmitter, maxRetry, integrity,
+    } = {
+      ...defaultOpts,
+      ...options,
+    };
+
     this.url = url;
     // eslint-disable-next-line global-require
     this.protocol = this.url.startsWith('https') ? require('https') : require('http');
