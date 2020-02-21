@@ -35,7 +35,7 @@ class JSONCache extends EventEmitter {
    * @param {number}    options.maxRetry     maximum number of attempts to retry getting data
    * @param {function}  options.integrity    optional function to check if the data is worth keeping
    */
-  constructor(url, timeout = 60000, options) {
+  constructor(url, timeout, options) {
     super();
 
     // eslint-disable-next-line no-param-reassign
@@ -51,7 +51,7 @@ class JSONCache extends EventEmitter {
     this.protocol = this.url.startsWith('https') ? require('https') : require('http');
 
     this.maxRetry = maxRetry;
-    this.timeout = timeout;
+    this.timeout = timeout || 60000;
     this.currentData = null;
     this.updating = null;
     this.Promise = promiseLib;
@@ -71,7 +71,7 @@ class JSONCache extends EventEmitter {
   }
 
   getData() {
-    if (this.delayStart) {
+    if (this.delayStart && !this.currentData && !this.updating) {
       this.startUpdating();
     }
     if (this.updating) {
