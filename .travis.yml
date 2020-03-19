@@ -1,7 +1,6 @@
 language: node_js
-
 os: linux
-
+dist: bionic
 cache: npm
 notifications:
     email: false
@@ -16,6 +15,8 @@ node_js:
   - 9
   - 8
 
+install: npm install
+
 stages:
   - lint
   - test
@@ -27,11 +28,11 @@ stages:
 
 jobs:
   include:
-    - name: lint
+    - stage: lint
       script: npm run lint
-    - name: coverage
+    - stage: coverage
       script: npm run coverage
-    - name: release
+    - stage: release
       node_js: node
       deploy:
         provider: script
@@ -41,5 +42,3 @@ jobs:
       script:
         - chmod +x ./.github/update_docs.sh
         - ./.github/update_docs.sh
-
-install: npm install
