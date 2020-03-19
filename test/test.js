@@ -9,12 +9,23 @@ const should = chai.should();
 
 const testJsonUrl = 'https://api.myjson.com/bins/bn2qa';
 
+// dumb logger to grab any logging output that would clog the test log
+const logger = {
+  debug: () => {},
+  log: () => {},
+  info: () => {},
+  // eslint-disable-next-line no-console
+  // turn on to debug error: (e) => console.error(e),
+  error: () => {},
+  silly: () => {},
+};
+
 describe('JSON Fetch Cache', () => {
   let cache;
   beforeEach(() => {
     // eslint-disable-next-line global-require
     Fetcher = require('../jsoncache');
-    cache = new Fetcher(testJsonUrl);
+    cache = new Fetcher(testJsonUrl, 1000, { logger });
   });
 
   afterEach(() => {
@@ -29,6 +40,6 @@ describe('JSON Fetch Cache', () => {
       should.exist(result);
       result.key.should.equal('value');
       cache.stop();
-    });
+    }).timeout(20000);
   });
 });
