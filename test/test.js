@@ -7,7 +7,7 @@ let Fetcher = require('../jsoncache');
 
 const should = chai.should();
 
-const testJsonUrl = 'https://api.myjson.com/bins/bn2qa';
+const testJsonUrl = 'https://pastebin.com/raw/pvkhtD5n';
 
 // dumb logger to grab any logging output that would clog the test log
 const logger = {
