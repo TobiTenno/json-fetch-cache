@@ -39,12 +39,14 @@ class JSONCache extends EventEmitter {
     super();
 
     // eslint-disable-next-line no-param-reassign
-    const {
-      parser, promiseLib, logger, delayStart, opts, maxListeners, useEmitter, maxRetry, integrity,
-    } = {
+    options = {
       ...defaultOpts,
       ...options,
     };
+
+    const {
+      parser, promiseLib, logger, delayStart, opts, maxListeners, useEmitter, maxRetry, integrity,
+    } = options;
 
     this.url = url;
     // eslint-disable-next-line global-require
@@ -62,6 +64,7 @@ class JSONCache extends EventEmitter {
     this.opts = opts;
     this.useEmitter = useEmitter;
     this.integrity = integrity;
+
     if (useEmitter) {
       this.setMaxListeners(maxListeners);
     }
