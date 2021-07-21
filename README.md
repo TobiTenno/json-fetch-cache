@@ -5,6 +5,8 @@ A simple package for fetching JSON from a URL and caching it for a decided amoun
 ## [Documentation](https://matej.voboril.dev/json-fetch-cache)
 
 [![npm version](https://badge.fury.io/js/json-fetch-cache.svg)](https://badge.fury.io/js/json-fetch-cache)
+[![CI](https://github.com/TobiTenno/json-fetch-cache/actions/workflows/ci.yaml/badge.svg)](https://github.com/TobiTenno/json-fetch-cache/actions/workflows/ci.yaml)
+[![GitHub pages](https://github.com/TobiTenno/json-fetch-cache/actions/workflows/docs.yaml/badge.svg)](https://github.com/TobiTenno/json-fetch-cache/actions/workflows/docs.yaml)
 
 ## Installation
 ```bash
