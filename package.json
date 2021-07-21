@@ -4,12 +4,12 @@
   "description": "Utility for fetching and caching JSON for a configurable amount of time",
   "main": "jsoncache.js",
   "scripts": {
-    "test": "npx nyc --reporter=text mocha --exit",
-    "build-docs": "./node_modules/.bin/jsdoc -t ./node_modules/ink-docstrap/template -c jsdoc.conf -R README.md -r jsoncache.js -d docs",
+    "test": "nyc mocha",
+    "build-docs": "jsdoc -c jsdoc.conf -d docs",
     "semantic-release": "semantic-release",
-    "lint": "npx eslint jsoncache.js",
-    "lint:fix": "npx eslint jsoncache.js --fix",
-    "coverage": "npm test && npx nyc report --reporter=text-lcov | npx coveralls"
+    "lint": "eslint jsoncache.js",
+    "lint:fix": "eslint jsoncache.js --fix",
+    "coverage": "npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
     "json",
@@ -21,6 +21,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.2",
     "chai": "^4.1.2",
+    "coveralls": "^3.1.1",
     "decache": "^4.4.0",
     "eslint": "^6.1.0",
     "eslint-config-airbnb-base": "^13.2.0",
@@ -62,5 +63,46 @@
         ]
       }
     }
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "parserOptions": {
+      "sourceType": "script"
+    },
+    "rules": {
+      "valid-jsdoc": [
+        "error",
+        {
+          "requireReturn": false,
+          "requireReturnDescription": false,
+          "preferType": {
+            "String": "string",
+            "Number": "number",
+            "Boolean": "boolean",
+            "Function": "function",
+            "object": "Object",
+            "date": "Date",
+            "error": "Error"
+          },
+          "prefer": {
+            "return": "returns"
+          }
+        }
+      ],
+      "strict": [
+        "error",
+        "safe"
+      ],
+      "linebreak-style": "off"
+    }
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "lcov"
+    ]
+  },
+  "mocha": {
+    "exit": true
   }
 }
