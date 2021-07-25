@@ -3,7 +3,7 @@
 const EventEmitter = require('events');
 
 const retryCodes = [429].concat((process.env.JSON_CACHE_RETRY_CODES || '')
-  .split(',').map(code => parseInt(code.trim(), 10)));
+  .split(',').map((code) => parseInt(code.trim(), 10)));
 
 const defaultOpts = {
   parser: JSON.parse,
@@ -122,7 +122,7 @@ class JSONCache extends EventEmitter {
             resolve('[]');
           }
         } else {
-          response.on('data', chunk => body.push(chunk));
+          response.on('data', (chunk) => body.push(chunk));
           response.on('end', () => {
             this.retryCount = 0;
             resolve(body.join(''));
