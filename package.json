@@ -26,7 +26,7 @@
     "eslint": "^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.18.0",
-    "mocha": "^9.0.2",
+    "mocha": "^10.0.0",
     "nyc": "^15.1.0"
   },
   "homepage": "https://tobitenno.github.io/json-fetch-cache",
