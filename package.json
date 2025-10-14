@@ -105,5 +105,6 @@
   },
   "mocha": {
     "exit": true
-  }
+  },
+  "publishConfig": { "provenance": true }
 }
