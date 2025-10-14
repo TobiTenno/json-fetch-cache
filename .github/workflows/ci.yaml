@@ -67,6 +67,11 @@ jobs:
     strategy:
       matrix:
         node-version: ['lts/*']
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout
         uses: actions/checkout@v2
