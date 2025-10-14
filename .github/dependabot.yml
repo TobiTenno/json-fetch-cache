@@ -7,12 +7,26 @@ updates:
       day: "sunday"
       time: "00:00"
     commit-message:
-      prefix: ""
-      prefix-development: "dev"
-      include: "scope"
+      prefix: "ci"
     labels:
       - "dependencies"
     open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: "-"
+    rebase-strategy: "auto"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    commit-message:
+      prefix: "ci"
+    groups:
+      continuous-integration:
+        patterns:
+          - '*'
+    open-pull-requests-limit: 5
     pull-request-branch-name:
       separator: "-"
     rebase-strategy: "auto"
