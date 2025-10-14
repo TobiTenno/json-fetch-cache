@@ -34,10 +34,7 @@
     "url": "https://github.com/tobitenno/json-fetch-cache/issues",
     "email": "tobiah@protonmail.org"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tobitenno/json-fetch-cache.git"
-  },
+  "repository": "https://github.com/TobiTenno/json-fetch-cache",
   "release": {
     "analyzeCommits": {
       "preset": "angular",
